@@ -9,9 +9,9 @@ git config core.autocrlf false
 git config push.autoSetupRemote true
 git config user.name "Andy"
 git config user.email "duyanhnn@outlook.com"
-git fetch
+git fetch &> /dev/null
 [[ "$1" != "--no-stash" ]] && git stash
-git pull
+git pull &> /dev/null
 [[ "$1" != "--no-stash" ]] && git stash pop
 ./clean.sh
 git add $SCRIPT_DIR
