@@ -54,7 +54,8 @@ public class FindMedianInTheDataStream
     }
 
     // 2nd way, may be using binary tree is better
-    //
+    // I think this is (logN) or rather (N*logN) which is a little bit better
+    // We might come up with something better next time
     static class BinaryTreeBackedDataStream implements MedianExtractorDataStream
     {
         private TreeSet<Integer> tree = new TreeSet<>();
