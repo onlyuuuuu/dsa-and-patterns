@@ -1,9 +1,6 @@
 package com.onlyu.random;
 
-import java.util.Iterator;
-import java.util.PriorityQueue;
-import java.util.Stack;
-import java.util.TreeSet;
+import java.util.*;
 
 public class FindMedianInTheDataStream
 {
@@ -94,38 +91,99 @@ public class FindMedianInTheDataStream
         }
     }
 
+    // 3rd way, even better, taken from the idea of AVL tree, which is the storing the height of a left subtree and right subtree
+    // Adding costs O(logN), maybe O(2logN) and getting costs O(1)
+    static class DoubleHeapBackedDataStream implements MedianExtractorDataStream
+    {
+        private PriorityQueue<Integer> lesserLeftMaxHeap = new PriorityQueue<>(Collections.reverseOrder());
+        private PriorityQueue<Integer> largerRightMinHeap = new PriorityQueue<>();
+        private Integer median = null;
+
+        @Override
+        public void offer(int value)
+        {
+            if (median == null)
+            {
+                median = value;
+                return;
+            }
+            if (value < median)
+                lesserLeftMaxHeap.offer(value);
+            else largerRightMinHeap.offer(value);
+            int offset = lesserLeftMaxHeap.size() - largerRightMinHeap.size();
+            if (offset == 2)
+            {
+                largerRightMinHeap.offer(median);
+                median = lesserLeftMaxHeap.poll();
+            }
+            else if (offset == -2)
+            {
+                lesserLeftMaxHeap.offer(median);
+                median = largerRightMinHeap.poll();
+            }
+        }
+
+        @Override
+        public int size()
+        {
+            return lesserLeftMaxHeap.size() + largerRightMinHeap.size() + 1;
+        }
+
+        @Override
+        public int getMedian()
+        {
+            int offset = lesserLeftMaxHeap.size() - largerRightMinHeap.size();
+            if (offset == 1)
+                return (int)Math.ceil((double)(lesserLeftMaxHeap.peek() + median)/2);
+            else if (offset == -1)
+                return (int)Math.ceil((double)(largerRightMinHeap.peek() + median)/2);
+            else if (median == null)
+                return 0;
+            else
+                return median;
+        }
+    }
+
     public static void main(String[] args)
     {
-        MedianExtractorDataStream heapBacked = new HeapBackedDataStream();
-        heapBacked.offer(1);
-        heapBacked.offer(2);
-        heapBacked.offer(3);
-        heapBacked.offer(4);
-        heapBacked.offer(5);
-        heapBacked.offer(6);
+        List<MedianExtractorDataStream> dataStreams = Arrays.asList
+        (
+            new HeapBackedDataStream(),
+            new BinaryTreeBackedDataStream(),
+            new DoubleHeapBackedDataStream()
+        );
 
-        MedianExtractorDataStream treeBacked = new HeapBackedDataStream();
-        treeBacked.offer(1);
-        treeBacked.offer(2);
-        treeBacked.offer(3);
-        treeBacked.offer(4);
-        treeBacked.offer(5);
-        treeBacked.offer(6);
+        MedianExtractorDataStream heapBacked = dataStreams.get(0);
+        MedianExtractorDataStream treeBacked = dataStreams.get(1);
+        MedianExtractorDataStream doubleHeapBacked = dataStreams.get(2);
 
-        System.out.printf("\n[Heap Implementation] Median of 1, 2, 3, 4, 5, 6       is [%d]\n", heapBacked.getMedian());
-        System.out.printf("\n[Tree Implementation] Median of 1, 2, 3, 4, 5, 6       is [%d]\n", treeBacked.getMedian());
+        for (MedianExtractorDataStream stream : dataStreams)
+        {
+            stream.offer(1);
+            stream.offer(2);
+            stream.offer(3);
+            stream.offer(4);
+            stream.offer(5);
+            stream.offer(6);
+        }
 
-        heapBacked.offer(7);
-        treeBacked.offer(7);
+        System.out.printf("\n[Heap Implementation] Median of 1, 2, 3, 4, 5, 6          is [%d]\n", heapBacked.getMedian());
+        System.out.printf("\n[Tree Implementation] Median of 1, 2, 3, 4, 5, 6          is [%d]\n", treeBacked.getMedian());
+        System.out.printf("\n[Heap Implementation x2] Median of 1, 2, 3, 4, 5, 6       is [%d]\n", doubleHeapBacked.getMedian());
 
-        System.out.printf("\n[Heap Implementation] Median of 1, 2, 3, 4, 5, 6, 7    is [%d]\n", heapBacked.getMedian());
-        System.out.printf("\n[Tree Implementation] Median of 1, 2, 3, 4, 5, 6, 7    is [%d]\n", treeBacked.getMedian());
+        for (MedianExtractorDataStream stream : dataStreams)
+            stream.offer(7);
 
-        heapBacked.offer(8);
-        treeBacked.offer(8);
+        System.out.printf("\n[Heap Implementation] Median of 1, 2, 3, 4, 5, 6, 7       is [%d]\n", heapBacked.getMedian());
+        System.out.printf("\n[Tree Implementation] Median of 1, 2, 3, 4, 5, 6, 7       is [%d]\n", treeBacked.getMedian());
+        System.out.printf("\n[Tree Implementation x2] Median of 1, 2, 3, 4, 5, 6, 7    is [%d]\n", doubleHeapBacked.getMedian());
 
-        System.out.printf("\n[Heap Implementation] Median of 1, 2, 3, 4, 5, 6, 7, 8 is [%d]\n", heapBacked.getMedian());
-        System.out.printf("\n[Tree Implementation] Median of 1, 2, 3, 4, 5, 6, 7, 8 is [%d]\n", treeBacked.getMedian());
+        for (MedianExtractorDataStream stream : dataStreams)
+            stream.offer(8);
+
+        System.out.printf("\n[Heap Implementation] Median of 1, 2, 3, 4, 5, 6, 7, 8    is [%d]\n", heapBacked.getMedian());
+        System.out.printf("\n[Tree Implementation] Median of 1, 2, 3, 4, 5, 6, 7, 8    is [%d]\n", treeBacked.getMedian());
+        System.out.printf("\n[Tree Implementation x2] Median of 1, 2, 3, 4, 5, 6, 7, 8 is [%d]\n", doubleHeapBacked.getMedian());
 
         System.out.printf("\n");
     }
