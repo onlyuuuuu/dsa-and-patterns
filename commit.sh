@@ -14,7 +14,7 @@ git fetch &> /dev/null
 git pull &> /dev/null
 [[ "$1" != "--no-stash" ]] && git stash pop
 ./clean.sh
-git add $SCRIPT_DIR
+git add --renormalize $SCRIPT_DIR
 commit_msg="Auto-generated commit message: /dev/null"
 [[ ! -z "$2" && "$2" != "" ]] && commit_msg="$2"
 git commit -m "$commit_msg"
