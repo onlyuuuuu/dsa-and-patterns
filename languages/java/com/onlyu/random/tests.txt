@@ -1,0 +1,26 @@
+Case 1: 0
+Expected: 0
+
+Case 2: 1
+Expected: 1
+
+Case 3: -1
+Expected: -1
+
+Case 4: 5, 11, 20, 65, 77
+Expected: 20
+
+Case 5: 11, 20, 5, 77, 65
+Expected: 20
+
+Case 6: 20, 5, 11, 77, 65
+Expected: 20
+
+Case 5: 77, 5, 11, 65, 20
+Expected: 20
+
+Case 6: -20, -7, -2, 22, 44, 80
+Expected: 10
+
+Case 7: -7, 22, 44, 80, -2, -20
+Expected: 10
