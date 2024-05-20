@@ -1,4 +1,8 @@
-package com.onlyu.utils;
+package com.onlyu.tools.impl;
+
+import com.onlyu.tools.intf.FlexibleRetriever;
+import com.onlyu.tools.intf.SingleRetriever;
+import com.onlyu.tools.intf.StandardRetriever;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -7,9 +11,10 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public class DefaultTestFileRetriever implements TestFileRetriever
+public class StandardTestRetriever implements SingleRetriever, StandardRetriever, FlexibleRetriever
 {
     private static final String DEFAULT_TEST_FILE_NAME_REGEX = "(test|case).*\\.(test|tests|case|txt|conf)";
 
@@ -22,21 +27,30 @@ public class DefaultTestFileRetriever implements TestFileRetriever
         }
     }
 
-    @Override
-    public File getDefault()
+    private static StandardTestRetriever INSTANCE;
+
+    public static synchronized StandardTestRetriever getInstance()
     {
-        List<File> files = from();
+        if (INSTANCE == null)
+            INSTANCE = new StandardTestRetriever();
+        return INSTANCE;
+    }
+
+    @Override
+    public File retrieve()
+    {
+        List<File> files = retrieveMultiple();
         return !files.isEmpty() ? files.get(0) : null;
     }
 
     @Override
-    public List<File> from()
+    public List<File> retrieveMultiple()
     {
-        return from(null);
+        return retrieveMultipleFrom(null);
     }
 
     @Override
-    public List<File> from(File... files)
+    public List<File> retrieveMultipleFrom(File... files)
     {
         StackTraceElement[] elements = Thread.currentThread().getStackTrace();
         String className = elements[elements.length - 1].getClassName();
@@ -75,10 +89,12 @@ public class DefaultTestFileRetriever implements TestFileRetriever
         catch (ClassNotFoundException e)
         {
             System.err.printf("\nClass %s not found. Encountered [%s]\n", className, e.getMessage());
+            return Collections.emptyList();
         }
         catch (URISyntaxException e)
         {
             System.err.printf("\nError parsing source path. Encountered [%s]\n", e.getMessage());
+            return Collections.emptyList();
         }
         return testFiles;
     }
