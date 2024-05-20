@@ -4,11 +4,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class DefaultTestFileRetriever implements TestFileRetriever
@@ -90,7 +88,7 @@ public class DefaultTestFileRetriever implements TestFileRetriever
         path = path.replaceAll("file:[\\/\\\\]*", "");
         path = path.replace("/", File.separator);
         path = path.replace("\\", File.separator);
-        path = path.replace(System.getProperty("user.dir"), "");
+        path = path.replace(System.getProperty("user.dir").replaceFirst("^/", ""), "");
         if (!removeFirstSlash)
             return path;
         path = path.replaceFirst("\\/", "");
