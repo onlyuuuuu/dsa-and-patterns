@@ -1,5 +1,11 @@
 package com.onlyu.random;
 
+import com.onlyu.tools.impl.StandardMatchingTask;
+import com.onlyu.tools.impl.StandardTestRetriever;
+import com.onlyu.tools.impl.displayables.DisplayableIntegers;
+import com.onlyu.tools.impl.parsers.IntegersExpectIntegerParser;
+import com.onlyu.tools.intf.Case;
+
 import java.util.*;
 
 public class FindMedianInTheDataStream
@@ -48,6 +54,12 @@ public class FindMedianInTheDataStream
                 heap.offer(temp.pop());
             return median;
         }
+
+        @Override
+        public String toString()
+        {
+            return this.getClass().toString();
+        }
     }
 
     // 2nd way, may be using binary tree is better
@@ -88,6 +100,12 @@ public class FindMedianInTheDataStream
             if (traversed + 1 != tree.size() - (traversed + 1))
                 return median;
             return (int)Math.ceil((double)(median + iterator.next())/2);
+        }
+
+        @Override
+        public String toString()
+        {
+            return this.getClass().toString();
         }
     }
 
@@ -142,49 +160,36 @@ public class FindMedianInTheDataStream
             else
                 return median;
         }
+
+        @Override
+        public String toString()
+        {
+            return this.getClass().toString();
+        }
+    }
+
+    private static synchronized MedianExtractorDataStream initialize()
+    {
+        MedianExtractorDataStream dataStream;
+        //dataStream = new HeapBackedDataStream();
+        //dataStream = new BinaryTreeBackedDataStream();
+        dataStream = new DoubleHeapBackedDataStream();
+        return dataStream;
     }
 
     public static void main(String[] args)
     {
-        List<MedianExtractorDataStream> dataStreams = Arrays.asList
-        (
-            new HeapBackedDataStream(),
-            new BinaryTreeBackedDataStream(),
-            new DoubleHeapBackedDataStream()
-        );
-
-        MedianExtractorDataStream heapBacked = dataStreams.get(0);
-        MedianExtractorDataStream treeBacked = dataStreams.get(1);
-        MedianExtractorDataStream doubleHeapBacked = dataStreams.get(2);
-
-        for (MedianExtractorDataStream stream : dataStreams)
+        MedianExtractorDataStream dataStream = initialize();
+        List<Case<DisplayableIntegers, Integer>> testCases = IntegersExpectIntegerParser.getInstance()
+            .parse(StandardTestRetriever.getInstance().retrieve());
+        for (Case<DisplayableIntegers, Integer> testCase : testCases)
         {
-            stream.offer(1);
-            stream.offer(2);
-            stream.offer(3);
-            stream.offer(4);
-            stream.offer(5);
-            stream.offer(6);
+            dataStream = initialize();
+            for (Integer input : testCase.getInput())
+                dataStream.offer(input);
+            testCase.matches(dataStream.getMedian(), new StandardMatchingTask<>());
         }
-
-        System.out.printf("\n[Heap Implementation] Median of 1, 2, 3, 4, 5, 6          is [%d]\n", heapBacked.getMedian());
-        System.out.printf("\n[Tree Implementation] Median of 1, 2, 3, 4, 5, 6          is [%d]\n", treeBacked.getMedian());
-        System.out.printf("\n[Heap Implementation x2] Median of 1, 2, 3, 4, 5, 6       is [%d]\n", doubleHeapBacked.getMedian());
-
-        for (MedianExtractorDataStream stream : dataStreams)
-            stream.offer(7);
-
-        System.out.printf("\n[Heap Implementation] Median of 1, 2, 3, 4, 5, 6, 7       is [%d]\n", heapBacked.getMedian());
-        System.out.printf("\n[Tree Implementation] Median of 1, 2, 3, 4, 5, 6, 7       is [%d]\n", treeBacked.getMedian());
-        System.out.printf("\n[Tree Implementation x2] Median of 1, 2, 3, 4, 5, 6, 7    is [%d]\n", doubleHeapBacked.getMedian());
-
-        for (MedianExtractorDataStream stream : dataStreams)
-            stream.offer(8);
-
-        System.out.printf("\n[Heap Implementation] Median of 1, 2, 3, 4, 5, 6, 7, 8    is [%d]\n", heapBacked.getMedian());
-        System.out.printf("\n[Tree Implementation] Median of 1, 2, 3, 4, 5, 6, 7, 8    is [%d]\n", treeBacked.getMedian());
-        System.out.printf("\n[Tree Implementation x2] Median of 1, 2, 3, 4, 5, 6, 7, 8 is [%d]\n", doubleHeapBacked.getMedian());
-
+        System.out.printf("\nThis is [%s] implementation.\n", dataStream);
         System.out.printf("\n");
     }
 

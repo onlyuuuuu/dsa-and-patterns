@@ -8,6 +8,18 @@ import java.util.*;
 
 public abstract class ParserTemplate<IT, ET> implements Parser<IT, ET>
 {
+    private final int _lineNumberPerCase;
+
+    private ParserTemplate()
+    {
+        this._lineNumberPerCase = 2;
+    }
+
+    public ParserTemplate(int lineNumberPerCase)
+    {
+        this._lineNumberPerCase = lineNumberPerCase;
+    }
+
     @Override
     public List<Case<IT, ET>> parse(File... files)
     {
@@ -18,23 +30,33 @@ public abstract class ParserTemplate<IT, ET> implements Parser<IT, ET>
     public List<Case<IT, ET>> parse(Collection<File> files)
     {
         List<Case<IT, ET>> cases = new ArrayList<>();
+        String[] lines = new String[_lineNumberPerCase];
+        Scanner scanner = null;
         for (File file : files)
         {
-            Scanner scanner = null;
             try
             {
+                int index = 0;
                 scanner = new Scanner(file);
                 while (scanner.hasNextLine())
                 {
-                    String line = scanner.next();
+                    String line = scanner.nextLine();
                     if (shouldIgnore(line))
                         continue;
-                    cases.add(toCase(line));
+                    if (index == _lineNumberPerCase)
+                    {
+                        Case<IT, ET> _case = toCase(lines);
+                        if (_case != null)
+                            cases.add(_case);
+                        lines = new String[_lineNumberPerCase];
+                        index = 0;
+                    }
+                    lines[index++] = line;
                 }
             }
             catch (Exception e)
             {
-                System.err.printf("Error parsing contents of %s", file.getAbsolutePath());
+                System.err.printf("\nError parsing contents of %s\n", file.getAbsolutePath());
                 e.printStackTrace();
             }
             finally
@@ -51,6 +73,6 @@ public abstract class ParserTemplate<IT, ET> implements Parser<IT, ET>
         return line.trim().length() == 0;
     }
 
-    protected abstract Case<IT, ET> toCase(String line);
+    protected abstract Case<IT, ET> toCase(String... line);
 
 }

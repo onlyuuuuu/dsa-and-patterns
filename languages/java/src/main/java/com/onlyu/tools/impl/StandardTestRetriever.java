@@ -16,24 +16,24 @@ import java.util.List;
 
 public final class StandardTestRetriever implements SingleRetriever, StandardRetriever, FlexibleRetriever
 {
-    private static final String DEFAULT_TEST_FILE_NAME_REGEX = "(test|case).*\\.(test|tests|case|txt|conf)";
+    private static final String _DEFAULT_TEST_FILE_NAME_REGEX = "(test|case).*\\.(test|tests|case|txt|conf)";
 
     static final class TestFilenameFilter implements FilenameFilter
     {
         @Override
         public boolean accept(File dir, String name)
         {
-            return name.matches(DEFAULT_TEST_FILE_NAME_REGEX);
+            return name.matches(_DEFAULT_TEST_FILE_NAME_REGEX);
         }
     }
 
-    private static StandardTestRetriever INSTANCE;
+    private static StandardTestRetriever _INSTANCE;
 
     public static synchronized StandardTestRetriever getInstance()
     {
-        if (INSTANCE == null)
-            INSTANCE = new StandardTestRetriever();
-        return INSTANCE;
+        if (_INSTANCE == null)
+            _INSTANCE = new StandardTestRetriever();
+        return _INSTANCE;
     }
 
     @Override

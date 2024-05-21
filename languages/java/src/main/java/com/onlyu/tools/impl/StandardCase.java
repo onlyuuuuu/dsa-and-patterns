@@ -5,49 +5,41 @@ import com.onlyu.tools.intf.MatchingTask;
 
 public class StandardCase<IT, ET> implements Case<IT, ET>
 {
-    private IT input;
-    private ET expected;
+    private IT _input;
+    private ET _expected;
 
-    public StandardCase(IT input, ET expected)
+    public void setInput(IT value)
     {
-        this.input = input;
-        this.expected = expected;
+        this._input = value;
     }
 
-    protected StandardCase<IT, ET> setInput(IT value)
+    public void setExpected(ET value)
     {
-        this.input = value;
-        return this;
-    }
-
-    protected StandardCase<IT, ET> setExpected(ET value)
-    {
-        this.expected = value;
-        return this;
+        this._expected = value;
     }
 
     @Override
     public IT getInput()
     {
-        return this.input;
+        return this._input;
     }
 
     @Override
     public ET getExpected()
     {
-        return this.expected;
+        return this._expected;
     }
 
     @Override
     public boolean matches(ET actual)
     {
-        return this.expected.equals(actual);
+        return this._expected.equals(actual);
     }
 
     @Override
     public boolean matches(ET actual, MatchingTask<IT, ET> task)
     {
-        boolean isMatch = this.expected.equals(actual);
+        boolean isMatch = this._expected.equals(actual);
         if (isMatch)
             task.onMatch(this, actual);
         else

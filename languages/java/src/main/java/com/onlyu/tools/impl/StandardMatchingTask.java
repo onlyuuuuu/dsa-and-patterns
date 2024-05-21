@@ -5,15 +5,6 @@ import com.onlyu.tools.intf.MatchingTask;
 
 public final class StandardMatchingTask<IT, ET> implements MatchingTask<IT, ET>
 {
-    private static StandardMatchingTask INSTANCE;
-
-    public static synchronized StandardMatchingTask getInstance()
-    {
-        if (INSTANCE == null)
-            INSTANCE = new StandardMatchingTask();
-        return INSTANCE;
-    }
-
     @Override
     public void onMatch(Case<IT, ET> testCase, ET actual)
     {
