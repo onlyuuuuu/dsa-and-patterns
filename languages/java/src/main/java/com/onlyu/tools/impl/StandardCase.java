@@ -39,19 +39,19 @@ public class StandardCase<IT, ET> implements Case<IT, ET>
     }
 
     @Override
-    public boolean matches(ET payload)
+    public boolean matches(ET actual)
     {
-        return this.expected.equals(payload);
+        return this.expected.equals(actual);
     }
 
     @Override
-    public boolean matches(ET payload, MatchingTask task)
+    public boolean matches(ET actual, MatchingTask<IT, ET> task)
     {
-        boolean isMatch = this.expected.equals(payload);
+        boolean isMatch = this.expected.equals(actual);
         if (isMatch)
-            task.onMatch();
+            task.onMatch(this, actual);
         else
-            task.onMismatch();
+            task.onMismatch(this, actual);
         return isMatch;
     }
 }

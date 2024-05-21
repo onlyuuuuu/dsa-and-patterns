@@ -1,14 +1,12 @@
-package com.onlyu.tools.impl;
+package com.onlyu.tools.impl.templates;
 
-import com.onlyu.tools.intf.*;
+import com.onlyu.tools.intf.Case;
+import com.onlyu.tools.intf.Parser;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
-public class StandardParserTemplate<IT, ET> implements Parser<IT, ET>
+public abstract class ParserTemplate<IT, ET> implements Parser<IT, ET>
 {
     @Override
     public List<Case<IT, ET>> parse(File... files)
@@ -19,6 +17,7 @@ public class StandardParserTemplate<IT, ET> implements Parser<IT, ET>
     @Override
     public List<Case<IT, ET>> parse(Collection<File> files)
     {
+        List<Case<IT, ET>> cases = new ArrayList<>();
         for (File file : files)
         {
             Scanner scanner = null;
@@ -27,7 +26,10 @@ public class StandardParserTemplate<IT, ET> implements Parser<IT, ET>
                 scanner = new Scanner(file);
                 while (scanner.hasNextLine())
                 {
-                    System.out.printf(scanner.next() + "\n");
+                    String line = scanner.next();
+                    if (shouldIgnore(line))
+                        continue;
+                    cases.add(toCase(line));
                 }
             }
             catch (Exception e)
@@ -41,6 +43,14 @@ public class StandardParserTemplate<IT, ET> implements Parser<IT, ET>
                     scanner.close();
             }
         }
-        return List.of();
+        return cases;
     }
+
+    protected boolean shouldIgnore(String line)
+    {
+        return line.trim().length() == 0;
+    }
+
+    protected abstract Case<IT, ET> toCase(String line);
+
 }

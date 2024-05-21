@@ -4,6 +4,6 @@ public interface Case<IT, ET>
 {
     IT getInput();
     ET getExpected();
-    boolean matches(ET payload);
-    boolean matches(ET payload, MatchingTask task);
+    boolean matches(ET actual);
+    boolean matches(ET actual, MatchingTask<IT, ET> task);
 }

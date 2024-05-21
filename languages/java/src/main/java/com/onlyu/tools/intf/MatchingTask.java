@@ -1,7 +1,7 @@
 package com.onlyu.tools.intf;
 
-public interface MatchingTask
+public interface MatchingTask<IT, ET>
 {
-    void onMatch();
-    void onMismatch();
+    void onMatch(Case<IT, ET> testCase, ET actual);
+    void onMismatch(Case<IT, ET> testCase, ET actual);
 }

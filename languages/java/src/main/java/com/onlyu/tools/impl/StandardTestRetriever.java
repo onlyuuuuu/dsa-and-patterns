@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class StandardTestRetriever implements SingleRetriever, StandardRetriever, FlexibleRetriever
+public final class StandardTestRetriever implements SingleRetriever, StandardRetriever, FlexibleRetriever
 {
     private static final String DEFAULT_TEST_FILE_NAME_REGEX = "(test|case).*\\.(test|tests|case|txt|conf)";
 
