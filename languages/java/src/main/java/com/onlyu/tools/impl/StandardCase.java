@@ -46,4 +46,14 @@ public class StandardCase<IT, ET> implements Case<IT, ET>
             task.onMismatch(this, actual);
         return isMatch;
     }
+
+    @Override
+    public String toString()
+    {
+        return "StandardCase" +
+                "{ " +
+                "_input = " + _input.toString() + ", " +
+                "_expected = " + _expected.toString() + " " +
+                "}";
+    }
 }

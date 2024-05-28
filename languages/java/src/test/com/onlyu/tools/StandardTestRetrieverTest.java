@@ -1,11 +1,11 @@
-package com.onlyu.utils;
+package com.onlyu.tools;
 
 import com.onlyu.tools.impl.StandardTestRetriever;
 import com.onlyu.tools.intf.SingleRetriever;
 
 import java.io.File;
 
-public class DefaultTestFileRetrieverTest
+public class StandardTestRetrieverTest
 {
     public static void main(String[] args)
     {

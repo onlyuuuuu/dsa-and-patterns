@@ -1,5 +1,6 @@
 package com.onlyu.tools.impl;
 
+import com.google.common.base.CaseFormat;
 import com.onlyu.tools.intf.FlexibleRetriever;
 import com.onlyu.tools.intf.SingleRetriever;
 import com.onlyu.tools.intf.StandardRetriever;
@@ -16,14 +17,21 @@ import java.util.List;
 
 public final class StandardTestRetriever implements SingleRetriever, StandardRetriever, FlexibleRetriever
 {
-    private static final String _DEFAULT_TEST_FILE_NAME_REGEX = "(test|case).*\\.(test|tests|case|txt|conf)";
+    private static final String _DEFAULT_TEST_FILE_NAME_REGEX = ".*\\.(test|tests|case|txt|conf|json)";
 
     static final class TestFilenameFilter implements FilenameFilter
     {
+        private final String _mandatorySequence;
+
+        public TestFilenameFilter(String mandatorySequence)
+        {
+            this._mandatorySequence = mandatorySequence;
+        }
+
         @Override
         public boolean accept(File dir, String name)
         {
-            return name.matches(_DEFAULT_TEST_FILE_NAME_REGEX);
+            return name.matches(".*" + _mandatorySequence +  _DEFAULT_TEST_FILE_NAME_REGEX);
         }
     }
 
@@ -55,6 +63,7 @@ public final class StandardTestRetriever implements SingleRetriever, StandardRet
         StackTraceElement[] elements = Thread.currentThread().getStackTrace();
         String className = elements[elements.length - 1].getClassName();
         String[] split = className.split("\\.");
+        String classNameSnakeCase = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, split[split.length - 1]);
         split = Arrays.copyOf(split, split.length - 1);
         String packagePath = sterilePathSeperators(String.join(File.separator, split), false);
         File invokedSourceDir = null;
@@ -75,11 +84,11 @@ public final class StandardTestRetriever implements SingleRetriever, StandardRet
                 secondarySearchDir = Paths.get(fullPath.replace(testStringSequence, productionStringSequence)).toFile();
             else
                 secondarySearchDir = null;
-            List<File> first = Arrays.stream(invokedSourceDir.listFiles(new TestFilenameFilter())).toList();
+            List<File> first = Arrays.stream(invokedSourceDir.listFiles(new TestFilenameFilter(classNameSnakeCase))).toList();
             List<File> second = new ArrayList<>();
-            if (secondarySearchDir != null && secondarySearchDir.listFiles(new TestFilenameFilter()) != null)
+            if (secondarySearchDir != null && secondarySearchDir.listFiles(new TestFilenameFilter(classNameSnakeCase)) != null)
             {
-                File[] secondaryTestFiles = secondarySearchDir.listFiles(new TestFilenameFilter());
+                File[] secondaryTestFiles = secondarySearchDir.listFiles(new TestFilenameFilter(classNameSnakeCase));
                 if (secondaryTestFiles != null && secondaryTestFiles.length > 0)
                     second = Arrays.stream(secondaryTestFiles).toList();
             }

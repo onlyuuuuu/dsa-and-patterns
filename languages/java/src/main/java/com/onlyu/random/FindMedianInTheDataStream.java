@@ -2,8 +2,8 @@ package com.onlyu.random;
 
 import com.onlyu.tools.impl.StandardMatchingTask;
 import com.onlyu.tools.impl.StandardTestRetriever;
-import com.onlyu.tools.impl.displayables.DisplayableIntegers;
-import com.onlyu.tools.impl.parsers.IntegersExpectIntegerParser;
+import com.onlyu.tools.impl.displayables.DisplayableArrayList;
+import com.onlyu.tools.impl.parsers.normal.IntegersExpectIntegerNormalParser;
 import com.onlyu.tools.intf.Case;
 
 import java.util.*;
@@ -180,9 +180,9 @@ public class FindMedianInTheDataStream
     public static void main(String[] args)
     {
         MedianExtractorDataStream dataStream = initialize();
-        List<Case<DisplayableIntegers, Integer>> testCases = IntegersExpectIntegerParser.getInstance()
+        List<Case<DisplayableArrayList<Integer>, Integer>> testCases = IntegersExpectIntegerNormalParser.getInstance()
             .parse(StandardTestRetriever.getInstance().retrieve());
-        for (Case<DisplayableIntegers, Integer> testCase : testCases)
+        for (Case<DisplayableArrayList<Integer>, Integer> testCase : testCases)
         {
             dataStream = initialize();
             for (Integer input : testCase.getInput())

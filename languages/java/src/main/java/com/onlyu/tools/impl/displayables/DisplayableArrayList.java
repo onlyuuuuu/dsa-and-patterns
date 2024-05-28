@@ -4,24 +4,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class DisplayableIntegers extends ArrayList<Integer>
+public class DisplayableArrayList<T> extends ArrayList<T>
 {
-    public DisplayableIntegers(Integer... integers)
+    public DisplayableArrayList(T... items)
     {
-        this(Arrays.stream(integers).toList());
+        this(Arrays.stream(items).toList());
     }
 
-    public DisplayableIntegers(List<Integer> integers)
+    public DisplayableArrayList(List<T> items)
     {
-        this.addAll(integers);
+        this.addAll(items);
     }
 
     @Override
     public String toString()
     {
         String display = "";
-        for (Integer integer : this)
-            display += integer + ", ";
+        for (T item : this)
+            display += item.toString() + ", ";
         if (!display.isEmpty())
             display = display.substring(0, display.length() - 2);
         return display;
