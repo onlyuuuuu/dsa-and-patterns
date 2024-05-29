@@ -136,9 +136,11 @@ public abstract class JsonParserTemplate<IT, ET> implements Parser<IT, ET>
 
     private int end(JsonReader reader, int type) throws Exception
     {
+        if (type == _VALUE_TYPE)
+            return type;
         if (type == _OBJECT_TYPE)
             reader.endObject();
-        else if (type == _ARRAY_TYPE)
+        else
             reader.endArray();
         return type;
     }
