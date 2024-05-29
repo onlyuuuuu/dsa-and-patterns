@@ -14,5 +14,6 @@ public class IntegersExpectIntegerJsonParserTest
             .parse(StandardTestRetriever.getInstance().retrieveMultiple());
         for (Case<DisplayableArrayList<Integer>, Integer> testCase : testCases)
             System.out.printf("\n" + testCase + "\n");
+        System.out.printf("\n");
     }
 }

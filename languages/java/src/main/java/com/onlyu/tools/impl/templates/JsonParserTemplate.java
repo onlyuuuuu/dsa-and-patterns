@@ -12,6 +12,10 @@ import java.util.*;
 
 public abstract class JsonParserTemplate<IT, ET> implements Parser<IT, ET>
 {
+    private static final int _OBJECT_TYPE = 1;
+    private static final int _ARRAY_TYPE = 2;
+    private static final int _VALUE_TYPE = 3;
+
     private final String _inputFieldName;
     private final String _expecetedFieldName;
 
@@ -43,40 +47,27 @@ public abstract class JsonParserTemplate<IT, ET> implements Parser<IT, ET>
         {
             try
             {
+                Case<IT, ET> _case;
                 JsonReader reader = new JsonReader(new FileReader(file));
-                IT input = null;
-                ET expected = null;
-                boolean io1 = begin(reader);
-                boolean io2;
-                // TODO: Need to fix this logic
-                while (reader.hasNext())
-                {
-                    if (!io1)
-                        io1 = begin(reader);
-                    String field = reader.nextName();
-                    if (_inputFieldName.equals(field))
-                    {
-                        io2 = begin(reader);
-                        input = readInput(reader);
-                        end(reader, io2);
-                    }
-                    else if (_expecetedFieldName.equals(field))
-                    {
-                        io2 = begin(reader);
-                        expected = readExpected(reader);
-                        end(reader, io2);
-                    }
-                }
-                if (input == null || expected == null)
-                {
-                    end(reader, io1);
+                int type = begin(reader);
+                if (type == _VALUE_TYPE)
                     continue;
+                if (type == _OBJECT_TYPE)
+                {
+                    _case = readSingleCase(reader, false);
+                    if (_case != null)
+                        cases.add(_case);
                 }
-                StandardCase<IT, ET> _case = new StandardCase<>();
-                _case.setInput(input);
-                _case.setExpected(expected);
-                cases.add(_case);
-                end(reader, io1);
+                else
+                {
+                    while (reader.hasNext())
+                    {
+                        _case = readSingleCase(reader, true);
+                        if (_case != null)
+                            cases.add(_case);
+                    }
+                }
+                end(reader, type);
             }
             catch (Exception e)
             {
@@ -90,27 +81,66 @@ public abstract class JsonParserTemplate<IT, ET> implements Parser<IT, ET>
     public abstract IT readInput(JsonReader reader) throws IOException;
     public abstract ET readExpected(JsonReader reader) throws IOException;
 
-    private boolean begin(JsonReader reader) throws Exception
+    private Case<IT, ET> readSingleCase(JsonReader reader, boolean withBeginEnd) throws Exception
+    {
+        if (withBeginEnd)
+            reader.beginObject();
+        IT input = null;
+        ET expected = null;
+        int type;
+        while (reader.hasNext())
+        {
+            String field = reader.nextName();
+            if (_inputFieldName.equals(field))
+            {
+                type = begin(reader);
+                input = readInput(reader);
+                end(reader, type);
+                continue;
+            }
+            if (_expecetedFieldName.equals(field))
+            {
+                type = begin(reader);
+                expected = readExpected(reader);
+                end(reader, type);
+            }
+        }
+        if (withBeginEnd)
+            reader.endObject();
+        if (input == null || expected == null)
+            return null;
+        StandardCase<IT, ET> _case = new StandardCase<>();
+        _case.setInput(input);
+        _case.setExpected(expected);
+        return _case;
+    }
+
+    private int begin(JsonReader reader) throws Exception
     {
         try
         {
             reader.beginObject();
-            return true;
+            return _OBJECT_TYPE;
         }
         catch (Exception e)
         {
-            reader.beginArray();
-            return false;
+            if (e.getMessage().startsWith("Expected BEGIN_OBJECT but was BEGIN_ARRAY"))
+            {
+                reader.beginArray();
+                return _ARRAY_TYPE;
+            }
+            else
+                return _VALUE_TYPE;
         }
     }
 
-    private boolean end(JsonReader reader, boolean isObject) throws Exception
+    private int end(JsonReader reader, int type) throws Exception
     {
-        if (isObject)
+        if (type == _OBJECT_TYPE)
             reader.endObject();
-        else
+        else if (type == _ARRAY_TYPE)
             reader.endArray();
-        return isObject;
+        return type;
     }
 
 }
