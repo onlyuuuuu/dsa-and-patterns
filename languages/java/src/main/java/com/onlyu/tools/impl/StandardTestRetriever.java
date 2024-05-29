@@ -17,7 +17,7 @@ import java.util.List;
 
 public final class StandardTestRetriever implements SingleRetriever, StandardRetriever, FlexibleRetriever
 {
-    private static final String _DEFAULT_TEST_FILE_NAME_REGEX = ".*\\.(test|tests|case|txt|conf|json)";
+    private static final String _DEFAULT_TEST_FILE_NAME_REGEX = ".*\\.(test|tests|case|cases|txt|conf|config|json)";
 
     static final class TestFilenameFilter implements FilenameFilter
     {
